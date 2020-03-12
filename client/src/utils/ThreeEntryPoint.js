@@ -1,7 +1,8 @@
 import * as THREE from "three";
+import loadTexture from "../utils/textureLoader";
 
 export default function ThreeEntryPoint(sceneRef) {
-  let scene, camera, renderer, cone;
+  let scene, camera, renderer, cone, tx, ice;
 
   const init = function() {
     scene = new THREE.Scene();
@@ -32,27 +33,34 @@ export default function ThreeEntryPoint(sceneRef) {
     // controls.update();
 
     const geometry = new THREE.ConeGeometry(1, 4);
-    // const texture = loadTexture(require("../textures/cone.jpg"))
-    // const material = new THREE.MeshBasicMaterial( {color: 0xffff00} );
-    // function createConeMaterial() {
-    //   const coneTexture = THREE.TextureLoader(
-    //     url("../textures/waffle.jpg")
-    //   );
-    //     console.log(coneTexture)
-    //   var coneMaterial = new THREE.MeshBasicMaterial();
-    //   coneMaterial.map = coneTexture;
-    //   return coneMaterial;
-    // }
-
-    const material = new THREE.MeshNormalMaterial();
+    var image = new Image()
+    image.src = require('../textures/b64cone2.json').img
+    var tx = new THREE.Texture();
+    tx.image = image
+    image.onload = function(){
+      tx.needsUpdate = true;
+    }
+    //tx.repeat.set(1, 1);
+    //tx.wrapS = tx.wrapT = THREE.MirroredRepeatWrapping;
+    var material = new THREE.MeshBasicMaterial({map:tx});
     cone = new THREE.Mesh(geometry, material);
     cone.rotation.setFromVector3(new THREE.Vector3( 10, 10, 7));
     scene.add(cone);
+
+
+    var icemat = new THREE.MeshNormalMaterial();
+    //icemat.position.set(THREE.Vector3(0,45,25))
+    const icecream_vanilla = new THREE.SphereGeometry(1.5)
+    ice = new THREE.Mesh(icecream_vanilla, icemat);
+    //ice.position.set(THREE.Vector3(0,5,5))
+    ice.position.set(-1.5,2.4,0)
+    scene.add(ice);
   };
 
   const animate = function() {
     requestAnimationFrame(animate);
     cone.rotation.z += 0.01;
+    ice.rotation.z += 0.01;
     renderer.render(scene, camera);
   };
 
